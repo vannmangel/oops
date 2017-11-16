@@ -172,7 +172,8 @@ Try {
 		}
 		
 		# <Perform Uninstallation tasks here>
-		
+        Execute-MSI "googlechromestandaloneenterprise64.msi" -Parameters "/qn REBOOT=REALLYSUPPRESS"
+
 		
 		##*===============================================
 		##* POST-UNINSTALLATION
