@@ -112,7 +112,7 @@ Try {
 		[string]$installPhase = 'Pre-Installation'
 		
 		## Show Welcome Message, close Internet Explorer if required, allow up to 3 deferrals, verify there is enough disk space to complete the install, and persist the prompt
-		Show-InstallationWelcome -AllowDefer -DeferTimes 3 -CheckDiskSpace -PersistPrompt
+		Show-InstallationWelcome -CheckDiskSpace -PersistPrompt
 		
 		## Show Progress Message (with the default message)
 		Show-InstallationProgress
@@ -142,7 +142,7 @@ Try {
 		## <Perform Post-Installation tasks here>
 		
 		## Display a message at the end of the install
-		If (-not $useDefaultMsi) { Show-InstallationPrompt -Message 'You can customize text to appear at the end of an install or remove it completely for unattended installations.' -ButtonRightText 'OK' -Icon Information -NoWait }
+		If (-not $useDefaultMsi) { Show-InstallationPrompt -Message 'Installation complete! :).' -ButtonRightText 'OK' -Icon Information -NoWait }
 	}
 	ElseIf ($deploymentType -ieq 'Uninstall')
 	{
