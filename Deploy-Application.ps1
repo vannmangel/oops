@@ -132,7 +132,7 @@ Try {
 		}
 		
 		## <Perform Installation tasks here>
-		Execute-MSI "googlechromestandaloneenterprise64.msi" -Parameters "/qn REBOOT=REALLYSUPPRESS"
+		Execute-MSI -path "$dirFiles\googlechromestandaloneenterprise64.msi" -Parameters "/qn REBOOT=REALLYSUPPRESS"
 		
 		##*===============================================
 		##* POST-INSTALLATION
