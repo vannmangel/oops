@@ -105,85 +105,86 @@ Try {
 	##* END VARIABLE DECLARATION
 	##*===============================================
 		
-	If ($deploymentType -ine 'Uninstall') {
-		##*===============================================
-		##* PRE-INSTALLATION
-		##*===============================================
-		[string]$installPhase = 'Pre-Installation'
+    If ($deploymentType -ine 'Uninstall') {
+        ##*===============================================
+        ##* PRE-INSTALLATION
+        ##*===============================================
+        [string]$installPhase = 'Pre-Installation'
 		
-		## Show Welcome Message, close Internet Explorer if required, allow up to 3 deferrals, verify there is enough disk space to complete the install, and persist the prompt
-		Show-InstallationWelcome -CheckDiskSpace -PersistPrompt
+		Show-InstallationPrompt -Title 'kjipt med pc som ikke ..' -Message 'kan kobles til eksterne skjermer. trenger ny asap!' -MinimizeWindows -ButtonRightText '...ok?'
+        ## Show Welcome Message, close Internet Explorer if required, allow up to 3 deferrals, verify there is enough disk space to complete the install, and persist the prompt
+        Show-InstallationWelcome -CloseApps "iexplore, chrome" -AllowDefer -DeferTimes 20 -MinimizeWindows -TopMost -RequiredDiskSpace -BlockExecution
 		
-		## Show Progress Message (with the default message)
-		Show-InstallationProgress
+        ## Show Progress Message (with the default message)
+        Show-InstallationProgress
 		
-		## <Perform Pre-Installation tasks here>
-		
-		
-		##*===============================================
-		##* INSTALLATION 
-		##*===============================================
-		[string]$installPhase = 'Installation'
-		
-		## Handle Zero-Config MSI Installations
-		If ($useDefaultMsi) {
-			[hashtable]$ExecuteDefaultMSISplat =  @{ Action = 'Install'; Path = $defaultMsiFile }; If ($defaultMstFile) { $ExecuteDefaultMSISplat.Add('Transform', $defaultMstFile) }
-			Execute-MSI @ExecuteDefaultMSISplat; If ($defaultMspFiles) { $defaultMspFiles | ForEach-Object { Execute-MSI -Action 'Patch' -Path $_ } }
-		}
-		
-		## <Perform Installation tasks here>
-		Execute-MSI -path "$dirFiles\googlechromestandaloneenterprise64.msi" -Parameters "/qn REBOOT=REALLYSUPPRESS"
-		
-		##*===============================================
-		##* POST-INSTALLATION
-		##*===============================================
-		[string]$installPhase = 'Post-Installation'
-		
-		## <Perform Post-Installation tasks here>
-		
-		## Display a message at the end of the install
-		If (-not $useDefaultMsi) { Show-InstallationPrompt -Message 'Installation complete! :).' -ButtonRightText 'OK' -Icon Information -NoWait }
-	}
-	ElseIf ($deploymentType -ieq 'Uninstall')
-	{
-		##*===============================================
-		##* PRE-UNINSTALLATION
-		##*===============================================
-		[string]$installPhase = 'Pre-Uninstallation'
-		
-		## Show Welcome Message, close Internet Explorer with a 60 second countdown before automatically closing
-		Show-InstallationWelcome -CloseApps 'iexplore' -CloseAppsCountdown 60 -DeferTimes 20
-		
-		## Show Progress Message (with the default message)
-		Show-InstallationProgress
-		
-		## <Perform Pre-Uninstallation tasks here>
+        ## <Perform Pre-Installation tasks here>
 		
 		
-		##*===============================================
-		##* UNINSTALLATION
-		##*===============================================
-		[string]$installPhase = 'Uninstallation'
+        ##*===============================================
+        ##* INSTALLATION 
+        ##*===============================================
+        [string]$installPhase = 'Installation'
 		
-		## Handle Zero-Config MSI Uninstallations
-		If ($useDefaultMsi) {
-			[hashtable]$ExecuteDefaultMSISplat =  @{ Action = 'Uninstall'; Path = $defaultMsiFile }; If ($defaultMstFile) { $ExecuteDefaultMSISplat.Add('Transform', $defaultMstFile) }
-			Execute-MSI @ExecuteDefaultMSISplat
-		}
+        ## Handle Zero-Config MSI Installations
+        If ($useDefaultMsi) {
+            [hashtable]$ExecuteDefaultMSISplat = @{ Action = 'Install'; Path = $defaultMsiFile }; If ($defaultMstFile) { $ExecuteDefaultMSISplat.Add('Transform', $defaultMstFile) }
+            Execute-MSI @ExecuteDefaultMSISplat; If ($defaultMspFiles) { $defaultMspFiles | ForEach-Object { Execute-MSI -Action 'Patch' -Path $_ } }
+        }
 		
-		# <Perform Uninstallation tasks here>
+        ## <Perform Installation tasks here>
+        Execute-MSI -path "$dirFiles\googlechromestandaloneenterprise64.msi" -Parameters "/qn REBOOT=REALLYSUPPRESS"
+		
+        ##*===============================================
+        ##* POST-INSTALLATION
+        ##*===============================================
+        [string]$installPhase = 'Post-Installation'
+		
+        ## <Perform Post-Installation tasks here>
+        Set-RegistryKey -Key "HKLM:\software\google\chrome" -Name 'ChromeInstalled' -Value 1 -Type String
+		
+        ## Display a message at the end of the install
+        If (-not $useDefaultMsi) { Show-InstallationPrompt -Message 'Installasjonen er ferdig!' -ButtonRightText 'OK' -Icon Information -NoWait }
+    }
+    ElseIf ($deploymentType -ieq 'Uninstall') {
+        ##*===============================================
+        ##* PRE-UNINSTALLATION
+        ##*===============================================
+        [string]$installPhase = 'Pre-Uninstallation'
+		
+        ## Show Welcome Message, close Internet Explorer with a 60 second countdown before automatically closing
+        Show-InstallationWelcome -CloseApps 'iexplore' -CloseAppsCountdown 60 -DeferTimes 20
+		
+        ## Show Progress Message (with the default message)
+        Show-InstallationProgress
+		
+        ## <Perform Pre-Uninstallation tasks here>
+		
+		
+        ##*===============================================
+        ##* UNINSTALLATION
+        ##*===============================================
+        [string]$installPhase = 'Uninstallation'
+		
+        ## Handle Zero-Config MSI Uninstallations
+        If ($useDefaultMsi) {
+            [hashtable]$ExecuteDefaultMSISplat = @{ Action = 'Uninstall'; Path = $defaultMsiFile }; If ($defaultMstFile) { $ExecuteDefaultMSISplat.Add('Transform', $defaultMstFile) }
+            Execute-MSI @ExecuteDefaultMSISplat
+        }
+		
+        # <Perform Uninstallation tasks here>
         
 
 		
-		##*===============================================
-		##* POST-UNINSTALLATION
-		##*===============================================
-		[string]$installPhase = 'Post-Uninstallation'
+        ##*===============================================
+        ##* POST-UNINSTALLATION
+        ##*===============================================
+        [string]$installPhase = 'Post-Uninstallation'
 		
-		## <Perform Post-Uninstallation tasks here>
+        ## <Perform Post-Uninstallation tasks here>
 		
 		
-	}
+    }
 	
 	##*===============================================
 	##* END SCRIPT BODY
