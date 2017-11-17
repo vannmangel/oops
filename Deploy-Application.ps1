@@ -113,7 +113,7 @@ Try {
 		
 		Show-InstallationPrompt -Title 'kjipt med pc som ikke ..' -Message 'kan kobles til eksterne skjermer. trenger ny asap!' -MinimizeWindows $true -ButtonRightText '...ok?'
         ## Show Welcome Message, close Internet Explorer if required, allow up to 3 deferrals, verify there is enough disk space to complete the install, and persist the prompt
-        Show-InstallationWelcome -CloseApps "iexplore, chrome" -AllowDefer -DeferTimes '20' -MinimizeWindows -TopMost -RequiredDiskSpace -BlockExecution
+        Show-InstallationWelcome -CloseApps "iexplore, chrome" -AllowDefer -DeferTimes 5 -MinimizeWindows -TopMost -RequiredDiskSpace -BlockExecution
 		
         ## Show Progress Message (with the default message)
         Show-InstallationProgress
